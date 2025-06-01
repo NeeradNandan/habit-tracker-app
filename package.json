@@ -5,7 +5,7 @@
   "scripts": {
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "start": "expo start",
+    "start": "IP=$(ifconfig en7 | grep 'inet ' | awk '{print $2}' || echo '') && echo \"Using IP: $IP\" && if [ -z \"$IP\" ]; then echo 'Error: No IP address found for en7. Check USB connection.'; exit 1; else EXPO_DEVTOOLS_LISTEN_ADDRESS=$IP REACT_NATIVE_PACKAGER_HOSTNAME=$IP npx expo start; fi",
     "prebuild": "expo prebuild",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
@@ -26,6 +26,7 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-paper": "^5.14.5",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
