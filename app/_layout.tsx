@@ -1,28 +1,33 @@
 import '../global.css';
-import { Stack, usePathname, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { Stack, useRouter, useSegments } from "expo-router";
+import React, { useEffect } from "react";
+import { AuthProvider, useAuth } from "~/hooks/Auth-context";
 
 function RouteGuard({ children }: { children: React.ReactNode }) {
-  const isAuth = false;
+  const { user, isLoadingUser } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
+  const segments = useSegments();
   useEffect(() => {
-    if(!isAuth && pathname !== "/Auth") {
-      //router.replace("/Auth");
+    const inAuthGroup = segments[0] === "Auth";
+    
+    if( !user && !inAuthGroup && !isLoadingUser ) {
+      router.replace( "/Auth" );
+    } else if ( user && inAuthGroup && !isLoadingUser ) {
+      router.replace( "/" );
     }
-  });
+  }, [ user, segments ] );
   
   return <>{children}</>;
 }
 
 export default function RootLayout() {
   return (
-      <Stack>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="Auth" />
-        </Stack>
-      </Stack>
+      <AuthProvider>
+        <RouteGuard>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+        </RouteGuard>
+      </AuthProvider>
   );
 }
