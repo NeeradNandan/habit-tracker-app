@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "start": "IP=$(ifconfig en7 | grep 'inet ' | awk '{print $2}' || echo '') && echo \"Using IP: $IP\" && if [ -z \"$IP\" ]; then echo 'Error: No IP address found for en7. Check USB connection.'; exit 1; else EXPO_DEVTOOLS_LISTEN_ADDRESS=$IP REACT_NATIVE_PACKAGER_HOSTNAME=$IP npx expo start; fi",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "start": "expo start",
+    "usb-start": "IP=$(ifconfig en7 | grep 'inet ' | awk '{print $2}' || echo '') && echo \"Using IP: $IP\" && if [ -z \"$IP\" ]; then echo 'Error: No IP address found for en7. Check USB connection.'; exit 1; else EXPO_DEVTOOLS_LISTEN_ADDRESS=$IP REACT_NATIVE_PACKAGER_HOSTNAME=$IP npx expo start; fi",
     "prebuild": "expo prebuild",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
