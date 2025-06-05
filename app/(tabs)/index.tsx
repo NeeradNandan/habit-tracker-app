@@ -91,17 +91,88 @@ export default function Index() {
     
     const handleDelete = async ( id: string ) => {
         try {
+            const completionResponse = await database.listDocuments(
+                DATABASE_ID,
+                HABITS_COMPLETION_COLLECTION_ID,
+                [
+                    Query.equal("habit_id", id),
+                    Query.equal("user_id", user?.$id ?? ""),
+                ]
+            );
+            
+            const completions = completionResponse.documents as HabitCompletions[];
+            for (const completion of completions) {
+                await database.deleteDocument(
+                    DATABASE_ID,
+                    HABITS_COMPLETION_COLLECTION_ID,
+                    completion.$id
+                );
+                console.log(`Deleted completion record ${completion.$id} for habit ${id}`);
+            }
             await database.deleteDocument( DATABASE_ID, HABITS_COLLECTION_ID, id )
         } catch (error) {
             console.error( error );
         }
     };
     
+    const intervals = {
+        "Daily": 24 * 60 * 60 * 1000,
+        "Weekly": 7 * 24 * 60 * 60 * 1000,
+        "Monthly": 30 * 24 * 60 * 60 * 1000,
+    }
+    
     const handleComplete = async ( id: string ) => {
         if ( !user || completedHabits?.includes(id) ) return;
         
         try {
-            const currentDate = new Date().toISOString();
+            
+            const habit = habits?.find( ( habit ) => habit.$id === id );
+            
+            if(!habit) return;
+            
+            const currentDate = new Date();
+            let canComplete = false;
+            let newStreak = 1;
+            
+            const getPeriodEnd = (lastCompleted: Date, frequency: string): Date => {
+                const end = new Date(lastCompleted);
+                if (frequency === "Daily") {
+                    end.setDate(end.getDate() + 1);
+                    end.setHours(23, 59, 59, 999);
+                } else if (frequency === "Weekly") {
+                    end.setDate(end.getDate() + 7);
+                    end.setHours(23, 59, 59, 999);
+                } else if (frequency === "Monthly") {
+                    end.setMonth(end.getMonth() + 1);
+                    end.setHours(23, 59, 59, 999);
+                }
+                return end;
+            };
+            
+            if (!habit.last_completed || isNaN(new Date(habit.last_completed).getTime())) {
+                // First completion
+                canComplete = true;
+            } else {
+                const lastCompleted = new Date(habit.last_completed);
+                const periodEnd = getPeriodEnd(lastCompleted, habit.frequency);
+                
+                console.log(`Current: ${currentDate}, Period End: ${periodEnd}`);
+                
+                if (currentDate <= periodEnd) {
+                    // Within the allowed period
+                    canComplete = true;
+                    newStreak = habit.streak_count + 1;
+                } else {
+                    // Period missed, reset streak
+                    canComplete = true;
+                    newStreak = 1;
+                }
+            }
+            
+            if (!canComplete) {
+                console.log(`Cannot complete habit: ${habit.title}. Wait until next ${habit.frequency} period.`);
+                return;
+            }
             
             await database.createDocument(
                 DATABASE_ID,
@@ -110,21 +181,17 @@ export default function Index() {
                 {
                     habit_id: id,
                     user_id: user.$id ,
-                    completed_at: currentDate,
+                    completed_at: currentDate.toISOString(),
                 }
                 );
-            
-            const habit = habits?.find( ( habit ) => habit.$id === id );
-            
-            if(!habit) return;
             
             await database.updateDocument(
                 DATABASE_ID,
                 HABITS_COLLECTION_ID,
                 id,
                 {
-                    streak_count: habit.streak_count + 1,
-                    last_completed: currentDate,
+                    streak_count: newStreak,
+                    last_completed: currentDate.toISOString(),
                 }
             );
         } catch (error) {
@@ -165,6 +232,12 @@ export default function Index() {
                 }
             </View>
         );
+    
+    const getStreakText = (habit: Habit) => {
+        const count = habit.streak_count;
+        const unit = habit.frequency === "Daily" ? "day" : habit.frequency === "Weekly" ? "week" : "month";
+        return `${count} ${unit} streak`;
+    };
     
     return (
     <View
@@ -263,8 +336,8 @@ export default function Index() {
                                             style={styles.streakText}
                                         >
                                             {
-                                                habit.streak_count
-                                            } day streak
+                                                getStreakText(habit)
+                                            }
                                         </Text>
                                     </View>
                                     <View
