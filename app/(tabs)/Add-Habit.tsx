@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { Keyboard, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { ID } from "react-native-appwrite";
 import { Button, SegmentedButtons, Text, TextInput, useTheme } from "react-native-paper";
 import { useAuth } from "~/hooks/Auth-context";
@@ -21,6 +21,27 @@ export default function AddHabitScreen() {
 	const [ frequency, setFrequency ] = useState<Frequency>("daily");
 	const [ error, setError ] = useState<string>( "" );
 	const { user } =useAuth();
+	
+	const resetForm = useCallback(() => {
+		//console.log("Resetting form in AddHabitScreen at", new Date().toISOString());
+		setTitle("");
+		setDescription("");
+		setFrequency("Daily");
+		setError("");
+	}, []);
+	
+	useFocusEffect(
+		useCallback(() => {
+			//console.log("useFocusEffect triggered in AddHabitScreen at", new Date().toISOString());
+			resetForm();
+		}, [resetForm])
+	);
+	// Fallback reset on mount to handle cases where useFocusEffect doesn't trigger
+	/*useEffect(() => {
+		console.log("useEffect mount triggered in AddHabitScreen at", new Date().toISOString());
+		resetForm();
+	}, [resetForm]);*/
+	
 	
 	const router = useRouter();
 	
@@ -55,62 +76,68 @@ export default function AddHabitScreen() {
 		router.back();
 	}
 	return (
-		<View
-			style={styles.container}
+		<TouchableWithoutFeedback
+			onPress={Keyboard.dismiss}
 		>
-			<TextInput
-				style={styles.input}
-				label="Title"
-				mode="outlined"
-				onChangeText={setTitle}
-			/>
-			<TextInput
-				style={styles.input}
-				label="Description"
-				mode="outlined"
-				onChangeText={setDescription}
-			/>
 			<View
-				style={styles.frequencyContainer}
+				style={styles.container}
 			>
-			<SegmentedButtons
-				buttons=
-					{
-				FREQUENCIES.map((freq) => (
-					{
-						value: freq,
-						label: freq
-					}
-				))
-				}
-				onValueChange={(value) => setFrequency(value)}
-				value={frequency}
-			/>
-			</View>
-			<Button
-				mode="contained"
-				disabled=
-					{
-				!title && !description
-			}
-				onPress={handleSubmit}
-			>
-				Add Habit
-			</Button>
-			
-			{
-				error &&
-				<Text
-					style={
-						{
-							color: theme.colors.error
-						}
-					}
+				<TextInput
+					style={styles.input}
+					label="Title"
+					mode="outlined"
+					onChangeText={setTitle}
+					value={title}
+				/>
+				<TextInput
+					style={styles.input}
+					label="Description"
+					mode="outlined"
+					onChangeText={setDescription}
+					value={description}
+				/>
+				<View
+					style={styles.frequencyContainer}
 				>
-					{error}
-				</Text>
-			}
-		</View>
+				<SegmentedButtons
+					buttons=
+						{
+					FREQUENCIES.map((freq) => (
+						{
+							value: freq,
+							label: freq
+						}
+					))
+					}
+					onValueChange={(value) => setFrequency(value)}
+					value={frequency}
+				/>
+				</View>
+				<Button
+					mode="contained"
+					disabled=
+						{
+					!title && !description
+				}
+					onPress={handleSubmit}
+				>
+					Add Habit
+				</Button>
+				
+				{
+					error &&
+					<Text
+						style={
+							{
+								color: theme.colors.error
+							}
+						}
+					>
+						{error}
+					</Text>
+				}
+			</View>
+		</TouchableWithoutFeedback>
 	)
 }
 

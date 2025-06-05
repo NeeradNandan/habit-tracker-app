@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { KeyboardAvoidingView, Platform, View, StyleSheet } from "react-native";
+import { KeyboardAvoidingView, Platform, View, StyleSheet, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { Button, Text, TextInput, useTheme } from "react-native-paper";
 import { useState } from "react";
 import { useAuth } from "~/hooks/Auth-context";
@@ -57,59 +57,63 @@ export default function AuthScreen() {
             "height"
         }
         >
-            <View
-                style={styles.content}
+            <TouchableWithoutFeedback
+                onPress={Keyboard.dismiss}
             >
-                <Text
-                    style={styles.title}
-                    variant="headlineMedium"
+                <View
+                    style={styles.content}
                 >
-                    {isSignUp ? "Create Account" : "Welcome back"}
-                </Text>
-                <TextInput
-                    onChangeText={setEmail}
-                    style={styles.input}
-                    label="Email"
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                    placeholder="example@gmail.com"
-                    mode="outlined"
-                />
-                <TextInput
-                    onChangeText={setPwd}
-                    style={styles.input}
-                    label="Password"
-                    autoCapitalize="none"
-                    secureTextEntry
-                    mode="outlined"
-                />
-                {
-                    error &&
                     <Text
-                        style={
-                        {
-                            color: theme.colors.error
-                        }
-                        }
+                        style={styles.title}
+                        variant="headlineMedium"
                     >
-                        {error}
+                        {isSignUp ? "Create Account" : "Welcome back"}
                     </Text>
-                }
-                <Button
-                    onPress={handleAuth}
-                    style={styles.button}
-                    mode="contained"
-                >
-                    {isSignUp ? "Sign Up" : "Sign In"}
-                </Button>
-                <Button
-                    style={styles.switchModeButton}
-                    mode="text"
-                    onPress={handleSwitchMode}
-                >
-                    {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
-                </Button>
-            </View>
+                    <TextInput
+                        onChangeText={setEmail}
+                        style={styles.input}
+                        label="Email"
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        placeholder="example@gmail.com"
+                        mode="outlined"
+                    />
+                    <TextInput
+                        onChangeText={setPwd}
+                        style={styles.input}
+                        label="Password"
+                        autoCapitalize="none"
+                        secureTextEntry
+                        mode="outlined"
+                    />
+                    {
+                        error &&
+                        <Text
+                            style={
+                            {
+                                color: theme.colors.error
+                            }
+                            }
+                        >
+                            {error}
+                        </Text>
+                    }
+                    <Button
+                        onPress={handleAuth}
+                        style={styles.button}
+                        mode="contained"
+                    >
+                        {isSignUp ? "Sign Up" : "Sign In"}
+                    </Button>
+                    <Button
+                        style={styles.switchModeButton}
+                        mode="text"
+                        onPress={handleSwitchMode}
+                    >
+                        {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+                    </Button>
+                </View>
+            </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
     )
 }
