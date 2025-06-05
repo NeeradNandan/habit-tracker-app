@@ -5,8 +5,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Appwrite](https://img.shields.io/badge/Appwrite-Cloud-FD366E?logo=appwrite)](https://appwrite.io/)
 [![Node.js](https://img.shields.io/badge/Node.js-18-339933?logo=node.js)](https://nodejs.org/)
-[![GitHub Release](https://img.shields.io/github/v/release/your-username/habit-tracker-app)](https://github.com/NeeradNandan/habit-tracker-app/releases)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/your-username/habit-tracker-app)](https://github.com/NeeradNandan/habit-tracker-app/commits/main)
+[![GitHub Release](https://img.shields.io/github/v/release/NeeradNandan/habit-tracker-app)](https://github.com/NeeradNandan/habit-tracker-app/releases)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/NeeradNandan/habit-tracker-app)](https://github.com/NeeradNandan/habit-tracker-app/commits/)
 [![License](https://img.shields.io/badge/License-MIT-brightgreen)](https://opensource.org/licenses/MIT)
 
 ⭐ **Star us on GitHub — your support fuels our motivation!**
