@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ID, Models } from "react-native-appwrite";
 import { account } from "~/lib/appwrite";
@@ -13,6 +14,8 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+	
+	const router = useRouter();
 	
 	const [ user, setUser ] = useState<Models.User<Models.Preferences> | null>(null);
 	const [ isLoadingUser, setIsLoadingUser ] = useState<boolean>(true);
@@ -62,11 +65,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	};
 	
 	const signOut = async () => {
-		try {
+		/*try {
 			await account.deleteSession("current");
 			setUser( null );
 		} catch (error) {
 		    console.error(error);
+		}*/
+		try {
+			// Check if a session exists before deleting
+			await account.getSession("current");
+			await account.deleteSession("current");
+			setUser(null);
+			router.replace("/Auth"); // Optional: Reinforce redirect
+		} catch (error) {
+			if (error instanceof Error && error.message.includes("general_unauthorized_scope")) {
+				// No session exists, treat as already signed out
+				setUser(null);
+				router.replace("/Auth"); // Optional: Reinforce redirect
+			} else {
+				console.error("Sign out error:", error);
+				throw error; // Re-throw unexpected errors for debugging
+			}
 		}
 	}
 	
