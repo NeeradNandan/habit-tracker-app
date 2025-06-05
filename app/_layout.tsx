@@ -24,6 +24,8 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
+  const segments = useSegments();
+  
   return (
       <GestureHandlerRootView
           style={{
@@ -34,8 +36,20 @@ export default function RootLayout() {
           <PaperProvider>
             <SafeAreaProvider>
               <RouteGuard>
-                <Stack>
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack
+                    screenOptions={
+                  {
+                    title: segments[0] === "Auth" ? "Login or Register" : ""
+                  }
+                    }
+                >
+                  <Stack.Screen
+                      name="(tabs)"
+                      options={
+                    {
+                      headerShown: false
+                    }
+                  } />
                 </Stack>
               </RouteGuard>
             </SafeAreaProvider>
